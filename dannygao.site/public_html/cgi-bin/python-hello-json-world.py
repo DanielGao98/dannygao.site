@@ -18,3 +18,5 @@ print("Content-type:text/html\r\n")
 x = json.dumps(message)
 print(str(x))
 
+print("</body>")
+print("</html>")
