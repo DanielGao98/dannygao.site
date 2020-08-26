@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!--Script Reference [1] -->
+	<script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+</head>
+
+<body>
+	<!--Chart Component [2] -->
+	<div id="lineChart"></div>
+	<script>
+		const url = "http://dannygao.site/api/navigation";
+		const url2 = "http://dannygao.site/api/network";
+		const url3 = "http://dannygao.site/api/storage";
+		const fetchParams = {
+			method: 'GET',
+			mode: 'cors',
+		};
+		var series1 = {};
+		var s1data = [];
+		var series2 = {};
+		var s2data = [];
+		var series3 = {};
+		var s3data = [];
+
+		fetch(url, fetchParams)
+			.then(res => {
+				if (!res.ok) {
+					throw new TypeError(res.statusText);
+				}
+				return res.json();
+			})
+			.then(data => {
+				series1 = data;
+				console.log(series1);
+				Object.keys(series1).forEach(key => {
+					s1data.push(series1[key].data);
+
+				})
+
+				console.log(s1data);
+
+				fetch(url2, fetchParams)
+					.then(res => {
+						if (!res.ok) {
+							throw new TypeError(res.statusText);
+						}
+						return res.json();
+					})
+					.then(data => {
+						series2 = data;
+						console.log(series2);
+						Object.keys(series2).forEach(key => {
+							s2data.push(series2[key].data);
+						})
+
+						console.log(s2data);
+
+						fetch(url3, fetchParams)
+							.then(res => {
+								if (!res.ok) {
+									throw new TypeError(res.statusText);
+								}
+								return res.json();
+							})
+							.then(data => {
+								series3 = data;
+								console.log(series3);
+								Object.keys(series3).forEach(key => {
+									s3data.push(series3[key].data);
+								})
+
+								console.log(s3data);
+
+								let lineData = {
+									type: 'line',
+									series: [
+										{ values: s1data },
+										{ values: s2data },
+										{ values: s3data },
+									]
+								};
+
+								// Render Method[3]
+								zingchart.render({
+									id: 'lineChart',
+									data: lineData,
+									height: 400,
+									width: '100%'
+								});
+							})
+							.catch(err => {
+								console.log("ERROR");
+							});
+					})
+					.catch(err => {
+						console.log("ERROR");
+					});
+
+			})
+			.catch(err => {
+				console.log("ERROR");
+			});
+	</script>
+
+	<div id="barChart"></div>
+	<script>
+
+		const burl = "http://dannygao.site/api/fid";
+		const burl2 = "http://dannygao.site/api/lcp";
+
+		//const fetchParams = {
+		//	method: 'GET',
+		//	mode: 'cors',
+		//};
+		var bar1 = {};
+		var b1data = [];
+		var bar2 = {};
+		var b2data = [];
+
+		fetch(burl, fetchParams)
+			.then(res => {
+				if (!res.ok) {
+					throw new TypeError(res.statusText);
+				}
+				return res.json();
+			})
+			.then(data => {
+				bar1 = data;
+				console.log(bar1);
+				Object.keys(bar1).forEach(key => {
+					b1data.push(bar1[key].data);
+				})
+				console.log(b1data);
+				fetch(burl, fetchParams)
+					.then(res => {
+						if (!res.ok) {
+							throw new TypeError(res.statusText);
+						}
+						return res.json();
+					})
+					.then(data => {
+						bar2 = data;
+						console.log(bar2);
+						Object.keys(bar2).forEach(key => {
+							b2data.push(bar2[key].data);
+						})
+						console.log(b2data);
+						let barData = {
+							type: 'bar',
+							series: [
+								{ values: b1data },
+								{ values: b2data },
+							]
+						};
+
+						// Render Method[3]
+						zingchart.render({
+							id: 'barChart',
+							data: barData,
+							height: 400,
+							width: '100%'
+						});
+					})
+					.catch(err => {
+						console.log("ERROR");
+					});
+			})
+			.catch(err => {
+				console.log("ERROR");
+			});
+
+
+	</script>
+
+	<div id="pieChart"></div>
+	<script>
+		const purl = "http://dannygao.site/api/cls";
+		const purl2 = "http://dannygao.site/api/clsFinal";
+
+		var pie1 = {};
+		var p1data = [];
+		var pie2 = {};
+		var p2data = [];
+		var p1s = 0;
+		var p2s = 0;
+
+		fetch(purl, fetchParams)
+			.then(res => {
+				if (!res.ok) {
+					throw new TypeError(res.statusText);
+				}
+				return res.json();
+			})
+			.then(data => {
+				pie1 = data;
+				console.log(pie1);
+				Object.keys(pie1).forEach(key => {
+					p1data.push(pie1[key].data);
+				})
+				console.log(p1data);
+				p1s = p1data.reduce((a, b) => a + b, 0);
+				console.log(p1s);
+				fetch(burl, fetchParams)
+					.then(res => {
+						if (!res.ok) {
+							throw new TypeError(res.statusText);
+						}
+						return res.json();
+					})
+					.then(data => {
+						pie2 = data;
+						console.log(pie2);
+						Object.keys(pie2).forEach(key => {
+							p2data.push(pie2[key].data);
+						})
+						console.log(p2data);
+						p2s = p2data.reduce((a, b) => a + b, 0);
+						console.log(p2s);
+						let pieData = {
+							type: 'pie',
+							series: [
+								{ values: [p1s] },
+								{ values: [p2s] },
+							]
+						};
+
+						// Render Method[3]
+						zingchart.render({
+							id: 'pieChart',
+							data: pieData,
+							height: 400,
+							width: '100%'
+						});
+					})
+					.catch(err => {
+						console.log("ERROR");
+					});
+			})
+			.catch(err => {
+				console.log("ERROR");
+			});
+
+
+	</script>
+</body>
+
+</html>
