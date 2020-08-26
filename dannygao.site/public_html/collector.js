@@ -447,14 +447,11 @@ function reportPerf(measureName, data, customProperties = {}) {
 			let toPost = payload.data;
 			delete toPost.userAgent;
 			console.log(toPost);
-			fetch('http://dannygao.site:3002/browsers/', {
+			fetch('http://dannygao.site/api/browsers/', {
 				method: 'POST',
 				mode: 'cors',
 				headers: {
-					//'Origin': 'http://dannygao.site',
 					'Content-Type': 'application/json'
-					//'Authorization': 'Basic ' + btoa('danny:olympus'),
-					//'Accept': 'application/json' 
 				},
 				body: JSON.stringify(toPost)
 			})
@@ -466,6 +463,83 @@ function reportPerf(measureName, data, customProperties = {}) {
 					console.error('Error: ', error);
 				});
 		}
+		else if (measureName == "navigationTiming" || measureName == "networkInformation" || measureName == "storageEstimate") {
+			let toPost = { "data": payload.data};
+			console.log(toPost);
+			
+			let url = "";
+			
+			if (measureName == "navigationTiming") {
+				url = 'http://dannygao.site/api/navigation/';
+			}
+			else if (measureName == "networkInformation") {
+				url = 'http://dannygao.site/api/network/';
+			}
+			else if (measureName == "storageEstimate") {
+				url = 'http://dannygao.site/api/storage/';
+			}
+			fetch(url , {
+				method: 'POST',
+				mode: 'cors',
+				headers: {                                                                                                                                                                                                                                           'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(toPost)
+			})
+				.then(response => response.json())
+				.then(toPost => {
+					console.log('Success:', toPost);
+				})
+				.catch((error) => {
+					console.error('Error: ', error);
+				});
+		}
+
+		else {
+			let toPost = { "data": payload.data, "vitalsScore": payload.vitalsScore};
+			console.log(toPost);
+			
+			let url = "";
+			
+			if (measureName == "fp") {
+				url = 'http://dannygao.site/api/fp/';
+			}
+			else if (measureName == "fcp") {
+				url = 'http://dannygao.site/api/fcp/';
+			}
+			else if (measureName == "fid") {
+				url = 'http://dannygao.site/api/fid/';
+			}
+			else if (measureName == "lcp") {
+				url = 'http://dannygao.site/api/lcp/';
+			}
+			else if (measureName == "lcpFinal") {
+				url = 'http://dannygao.site/api/lcpf/';
+			}
+			else if (measureName == "cls") {
+				url = 'http://dannygao.site/api/cls/';
+			}
+			else if (measureName == "clsFinal") {
+				url = 'http://dannygao.site/api/clsf/';
+			}
+			else if (measureName == "tbt") {
+				url = 'http://dannygao.site/api/tbt/';
+			}
+			fetch(url , {
+				method: 'POST',
+				mode: 'cors',
+				headers: {                                                                                                                                                                                                                                           'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(toPost)
+			})
+				.then(response => response.json())
+				.then(toPost => {
+					console.log('Success:', toPost);
+				})
+				.catch((error) => {
+					console.error('Error: ', error);
+				});
+		}
+
 
 
 		// TODO: send payload to endpoint
