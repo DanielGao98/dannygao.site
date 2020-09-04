@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Script Reference [1] -->
+    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
+    <!--script type="module">import { zingchart, ZC } from '/node_modules/zingchart/es6.js'</script-->
+</head>
+
+
+<body>
+    <!--Chart Component [2] -->
+    <header>
+        <style>
+            header {
+                text-align: center;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-weight: bold;
+                font-size: xx-large;
+
+            }
+        </style> DATA DASHBOARD
+    </header>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <h1>
+        <style>
+            h1 {
+                text-align: center;
+                font-size: medium;
+                font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+            }
+        </style> CLS Scores For Different Screen Sizes
+    </h1>
+    <div id="screenData"></div>
+    <script>
+        const url = "http://dannygao.site/api/browsers";
+        const url2 = "http://dannygao.site/api/cls";
+        const fetchParams = {
+            method: 'GET',
+            mode: 'cors',
+        };
+        var browsersdata = {};
+        var browsersdatalist = [];
+        var clsdata = {};
+        var clsdatalist = [];
+        var smallavg = 0;
+        var smallcounter = 0;
+        var smalltotal = 0;
+        var medavg = 0;
+        var medcounter = 0;
+        var medtotal = 0;
+        var bigavg = 0;
+        var bigcounter = 0;
+        var bigtotal = 0;
+        var outerHeights = [];
+        var outerWidths = [];
+        var screenSizes = [];
+
+        fetch(url, fetchParams)
+            .then(res => {
+                if (!res.ok) {
+                    throw new TypeError(res.statusText);
+                }
+                return res.json();
+            })
+            .then(data => {
+                browsersdata = data;
+
+
+                for (d of browsersdata) {
+                    outerHeights.push(d.outerHeight)
+                    outerWidths.push(d.outerWidth)
+                }
+
+                for (var x = 0; x < outerHeights.length; x++) {
+                    screenSizes.push(outerHeights[x] * outerWidths[x])
+                }
+
+                fetch(url2, fetchParams)
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new TypeError(res.statusText);
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        clsdata = data;
+                        Object.keys(clsdata).forEach(key => {
+                            clsdatalist.push(clsdata[key].data);
+                        })
+
+                        for (var i = 0; i < clsdatalist.length; i++) {
+                            if (clsdatalist[i] != undefined && screenSizes[i] != undefined) {
+                                if (screenSizes[i] < 300441) {
+                                    smallcounter += 1
+                                    smalltotal += clsdatalist[i];
+                                    smallavg = smalltotal / smallcounter;
+                                }
+                                else if (screenSizes[i] >= 786432) {
+                                    bigcounter += 1
+                                    bigtotal += clsdatalist[i];
+                                    bigavg = bigtotal / bigcounter;
+                                }
+                                else {
+                                    medcounter += 1
+                                    medtotal += clsdatalist[i];
+                                    medavg = medtotal / medcounter;
+                                }
+                            }
+
+                        }
+                        console.log(smallavg)
+                        var averages = [smallavg, medavg, bigavg]
+                        console.log(averages)
+
+                        let screenData = {
+                            type: 'bar',
+                            series: [
+                                { values: averages, text: "CLS Scores for small, medium, large screens" }
+                            ],
+                            "scale-x": { values: ["small", "medium", "large"] },
+                            legend: {}
+                        };
+
+                        // Render Method[3]
+                        zingchart.render({
+                            id: 'screenData',
+                            data: screenData,
+                            height: 700,
+                            width: '100%'
+                        });
+
+                    })
+                    .catch(err => {
+                        console.log("ERROR");
+                    });
+
+            })
+            .catch(err => {
+                console.log("ERROR");
+            });
+    </script>
+
+    <h1>FCP vs LCP: Min, Avg, Max Loading Times</h1>
+    <div id="barChart"></div>
+    <script>
+
+        const burl = "http://dannygao.site/api/fcp";
+        const burl2 = "http://dannygao.site/api/lcp";
+
+        //const fetchParams = {
+        //	method: 'GET',
+        //	mode: 'cors',
+        //};
+        var bar1 = {};
+        var b1data = [];
+        var bar2 = {};
+        var b2data = [];
+
+        fetch(burl, fetchParams)
+            .then(res => {
+                if (!res.ok) {
+                    throw new TypeError(res.statusText);
+                }
+                return res.json();
+            })
+            .then(data => {
+                bar1 = data;
+                //console.log(bar1);
+                Object.keys(bar1).forEach(key => {
+                    b1data.push(bar1[key].data);
+                })
+                console.log(b1data);
+
+                b1data = b1data.filter(item => item < 8.95);
+                /*  for (var a = 0; a < b1data.length; a++) {
+                     if (b1data[a] > 7) {
+                         delete b1data[a]
+                     }
+                 } */
+
+                console.log(b1data)
+                fetch(burl2, fetchParams)
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new TypeError(res.statusText);
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        bar2 = data;
+                        //console.log(bar2);
+                        Object.keys(bar2).forEach(key => {
+                            b2data.push(bar2[key].data);
+                        })
+
+                        b2data = b2data.filter(item => item < 9);
+
+                        console.log(b2data);
+
+                        var b1min = Math.min.apply(Math, b1data)
+                        var b1max = Math.max.apply(Math, b1data)
+                        var b2min = Math.min.apply(Math, b2data)
+                        var b2max = Math.max.apply(Math, b2data)
+                        var b1total = 0
+                        var b2total = 0
+
+                        for (var q = 0; q < b1data.length; q++) {
+                            b1total += b1data[q]
+                        }
+                        for (var w = 0; w < b2data.length; w++) {
+                            b2total += b2data[w]
+                        }
+
+                        var b1avg = b1total / b1data.length
+                        var b2avg = b2total / b2data.length
+
+                        var b1vals = [b1min, b1avg, b1max]
+                        var b2vals = [b2min, b2avg, b2max]
+
+                        let barData = {
+                            type: 'bar',
+                            series: [
+                                { values: b1vals, text: "fcp times" },
+                                { values: b2vals, text: "lcp times" }
+                            ],
+                            "scale-x": { values: ["Minimum Time", "Average Time", "Maximum Time"] },
+                            legend: {}
+                        };
+
+                        // Render Method[3]
+                        zingchart.render({
+                            id: 'barChart',
+                            data: barData,
+                            height: 700,
+                            width: '100%'
+                        });
+                    })
+                    .catch(err => {
+                        console.log("ERROR");
+                    });
+            })
+            .catch(err => {
+                console.log("ERROR");
+            });
+
+
+    </script>
+
+    <h1>FID Data Grid</h1>
+    <zing-grid src="http://dannygao.site/api/fid/" idKey="id" page-size="5" layout="row" pager="" layout="row">
+    </zing-grid>
+
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+
+    <zing-grid src="http://reporting.dannygao.site:8081/users" caption="CRUD Endpoint" editor-controls="all" pager=""
+        page-size="5" layout="row" role="grid" editor="inline">
+    </zing-grid>
+    <!-- basic options with function reference for body -->
+
+
+</body>
+
+</html>

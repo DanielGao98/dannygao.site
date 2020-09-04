@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Script Reference [1] -->
+    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <script src="https://cdn.zinggrid.com/zinggrid.min.js" defer></script>
+    <!--script type="module">import { zingchart, ZC } from '/node_modules/zingchart/es6.js'</script-->
+</head>
+
+<body>
+    <header>
+        <style>
+            header {
+                text-align: center;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-weight: bold;
+                font-size: xx-large;
+
+            }
+        </style> CLS DATA DIVE
+    </header>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <h1>
+        <style>
+            h1 {
+                text-align: center;
+                font-size: medium;
+                font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+            }
+        </style>CLS Scores Each Visit
+    </h1>
+    <div id="clsScores"></div>
+    <script>
+        const url = "http://dannygao.site/api/cls";
+        const fetchParams = {
+            method: 'GET',
+            mode: 'cors',
+        };
+        var clsdata = {};
+        var clsdatalist = [];
+        fetch(url, fetchParams)
+            .then(res => {
+                if (!res.ok) {
+                    throw new TypeError(res.statusText);
+                }
+                return res.json();
+            })
+            .then(data => {
+                clsdata = data;
+                console.log(clsdata);
+                Object.keys(clsdata).forEach(key => {
+                    clsdatalist.push(clsdata[key].data);
+                })
+                console.log(clsdatalist)
+                clsdatalist = clsdatalist.filter(item => item < 12);
+
+                let lineData = {
+                    type: 'line',
+                    series: [
+                        { values: clsdatalist }
+                    ]
+                };
+
+                // Render Method[3]
+                zingchart.render({
+                    id: 'clsScores',
+                    data: lineData,
+                    height: 700,
+                    width: '100%',
+                });
+            })
+            .catch(err => {
+                console.log("ERROR");
+            });
+
+    </script>
+    <div>
+        <h1>Report</h1>
+        <p>
+            The purpose of this chart to examine the correlation between CLS score and the screen size of the
+            viewer. This is an interesting because it allows interpreters to examine and track possible CLS issues and
+            pinpoint
+            to which types of users these CLS issues are prevalent to. From the data displayed in this chart, one can
+            discover answers to many questions, one such question would be for which types of users are having
+            CLSissues, to
+            allow for more specific fixes if necessary. For example, if the CLS value was starting to become
+            increasingly higher
+            and worse for viewers with a small screen size, perhaps issues need to be addressed for viewers who would be
+            targeting
+            the webiste using smaller phones. In the grid above, The outlier values have been removed for a more logical
+            chart.
+        </p>
+    </div>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <h1>CLS Grid</h1>
+    <zing-grid src="http://dannygao.site/api/cls/" idKey="id" page-size="5" layout="row"></zing-grid>
